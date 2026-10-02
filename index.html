@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Информатика 5-сынып | Интерактивті Тест</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-grad1: #6366f1;
+            --bg-grad2: #a855f7;
+            --card-bg: #ffffff;
+            --text: #1f2937;
+            --correct-bg: #d1fae5;
+            --correct-color: #065f46;
+            --wrong-bg: #fee2e2;
+            --wrong-color: #991b1b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-grad1), var(--bg-grad2));
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text);
+        }
+
+        .container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 750px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f3f4f6;
+            padding-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        p.subtitle {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        /* Variant selector */
+        .variant-picker {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .variant-btn {
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .variant-btn:hover {
+            background: #e0e7ff;
+            border-color: var(--primary);
+        }
+
+        .variant-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: #e5e7eb;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 15px;
+        }
+
+        .badge {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            background: #fff;
+            border: 2px solid #e5e7eb;
+            padding: 14px 18px;
+            border-radius: 12px;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: #f5f3ff;
+            transform: translateY(-2px);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .option-btn.correct {
+            background-color: var(--correct-bg) !important;
+            border-color: #10b981 !important;
+            color: var(--correct-color) !important;
+        }
+
+        .option-btn.wrong {
+            background-color: var(--wrong-bg) !important;
+            border-color: #ef4444 !important;
+            color: var(--wrong-color) !important;
+        }
+
+        /* Feedback Modal/Box */
+        .feedback-box {
+            display: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            align-items: center;
+            gap: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-box.show {
+            display: flex;
+        }
+
+        .feedback-box.correct-box {
+            background-color: var(--correct-bg);
+            color: var(--correct-color);
+            border: 1px solid #a7f3d0;
+        }
+
+        .feedback-box.wrong-box {
+            background-color: var(--wrong-bg);
+            color: var(--wrong-color);
+            border: 1px solid #fecaca;
+        }
+
+        .feedback-emoji {
+            font-size: 2.5rem;
+            animation: bounce 0.5s ease;
+        }
+
+        .feedback-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .feedback-info p {
+            font-size: 0.9rem;
+        }
+
+        .next-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            float: right;
+            transition: background 0.2s ease;
+            display: none;
+        }
+
+        .next-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Results Screen */
+        .results-screen {
+            display: none;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .results-emoji {
+            font-size: 5rem;
+            margin-bottom: 15px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .results-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .score-num {
+            font-size: 2.2rem;
+            font-weight: 800;
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .restart-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.2s ease;
+        }
+
+        .restart-btn:hover {
+            background: #059669;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.25); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px; }
+            h1 { font-size: 1.4rem; }
+            .question-text { font-size: 1.05rem; }
+            .variant-btn { padding: 6px 12px; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>💻 Информатика 5-сынып</h1>
+        <p class="subtitle">Интерактивті тест кешені (Мемлекеттік оқу бағдарламасы бойынша)</p>
+    </header>
+
+    <!-- Нұсқа таңдау батырмалары -->
+    <div class="variant-picker" id="variantPicker">
+        <button class="variant-btn active" onclick="switchVariant(1)">1-нұсқа</button>
+        <button class="variant-btn" onclick="switchVariant(2)">2-нұсқа</button>
+        <button class="variant-btn" onclick="switchVariant(3)">3-нұсқа</button>
+        <button class="variant-btn" onclick="switchVariant(4)">4-нұсқа</button>
+        <button class="variant-btn" onclick="switchVariant(5)">5-нұсқа</button>
+    </div>
+
+    <!-- Тест экраны -->
+    <div id="quizScreen">
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="status-meta">
+            <span id="variantLabel">Нұсқа: 1</span>
+            <span id="questionCounter">Сұрақ: 1 / 10</span>
+        </div>
+
+        <div class="badge" id="objectiveBadge">Оқу мақсаты: 5.4.1.1</div>
+
+        <div class="question-text" id="questionText">Сұрақ жүктелуде...</div>
+
+        <div class="options-grid" id="optionsContainer">
+            <!-- Жауап нұсқалары дианмикалы түрде орнатылады -->
+        </div>
+
+        <!-- Кері байланыс смайликтері бар блок -->
+        <div class="feedback-box" id="feedbackBox">
+            <div class="feedback-emoji" id="feedbackEmoji">😃</div>
+            <div class="feedback-info">
+                <h4 id="feedbackTitle">Дұрыс!</h4>
+                <p id="feedbackDesc">Өте жақсы, дұрыс жауапты таптың!</p>
+            </div>
+        </div>
+
+        <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Келесі сұрақ ➔</button>
+        <div style="clear: both;"></div>
+    </div>
+
+    <!-- Нәтиже экраны -->
+    <div class="results-screen" id="resultsScreen">
+        <div class="results-emoji" id="resultsEmoji">🏆</div>
+        <h2 class="results-title" id="resultsTitle">Тест аяқталды!</h2>
+        <p id="resultsSubtitle">Сенің көрсеткішің:</p>
+
+        <div class="score-circle">
+            <div class="score-num" id="scoreNum">10 / 10</div>
+            <div class="score-label" id="scorePercent">100% ұпай</div>
+        </div>
+
+        <p id="resultsFeedback" style="margin-bottom: 20px; font-weight: 500;"></p>
+
+        <button class="restart-btn" onclick="restartQuiz()">Қайтадан өту 🔄</button>
+    </div>
+</div>
+
+<script>
+    // Тест сұрақтарының базасы (5 нұсқа х 10 сұрақ)
+    const quizDatabase = {
+        1: [
+            {
+                obj: "5.4.1.1 Эргономика және жұмыс орны",
+                q: "Компьютерде жұмыс істегенде экран мен көздің арасындағы дұрыс арақашықтық қанша болуы керек?",
+                options: ["10-20 см", "50-70 см", "100-150 см", "5-10 см"],
+                correct: 1,
+                exp: "Дұрыс! Экран мен көздің арасы 50-70 см (қол созым қашықтықта) болуы тиіс."
+            },
+            {
+                obj: "5.4.1.1 Эргономика және жұмыс орны",
+                q: "Компьютер алдында отырғанда арқаны қалай ұстаған дұрыс?",
+                options: ["Алға қарай қатты еңкейіп", "Қисайып, бір жаққа сүйеніп", "Түзу, орындық арқалығына сүйеніп", "Бүкірейіп"],
+                correct: 2,
+                exp: "Дұрыс! Омыртқа қисаймауы үшін арқаны түзу ұстау керек."
+            },
+            {
+                obj: "5.2.1.1 Ақпарат түрлері және екілік код",
+                q: "Компьютердегі барлық ақпарат қандай код түрінде сақталады?",
+                options: ["Ондық код", "Екілік код (0 және 1)", "Мәтіндік код", "Рим цифрлары"],
+                correct: 1,
+                exp: "Жарайсың! Компьютер ақпаратты 0 және 1 цифрларынан тұратын екілік кодта өңдейді."
+            },
+            {
+                obj: "5.2.1.1 Ақпарат түрлері және екілік код",
+                q: "Фотосуреттер мен сызбалар ақпараттың қай түріне жатады?",
+                options: ["Мәтіндік", "Дыбыстық", "Графикалық", "Сандық"],
+                correct: 2,
+                exp: "Өте жақсы! Бейнелер, суреттер — графикалық ақпарат."
+            },
+            {
+                obj: "5.3.3.1 Іздеу сұраныстары",
+                q: "Ғаламторда қажетті ақпаратты нақты әрі жылдам табу үшін іздеу жолына не жазылады?",
+                options: ["Ұзын әңгіме", "Негізгі кілт сөздер", "Кез келген сөздер", "Тек смайликтер"],
+                correct: 1,
+                exp: "Дұрыс! Іздеу сұранысы қысқа әрі негізгі кілт сөздерден тұруы керек."
+            },
+            {
+                obj: "5.3.3.1 Іздеу сұраныстары",
+                q: "Іздеу жүйесінде сөз тіркесін дәл сол күйінде табу үшін қандай белгі қолданылады?",
+                options: ["Тырнақшалар (\" \")", "Жақшалар ( )", "Торғай белгісі (#)", "Доллар белгісі (\$)"],
+                correct: 0,
+                exp: "Тамаша! Тырнақшаға алынған сөздер дәл солай ізделеді."
+            },
+            {
+                obj: "5.1.1.1 Есептеу техникасының тарихы",
+                q: "Ежелгі заманда сандық есептеулер жүргізуге арналған ең алғашқы құралдардың бірі:",
+                options: ["Ноутбук", "Абак (Есепшот)", "Калькулятор", "Смартфон"],
+                correct: 1,
+                exp: "Дұрыс! Абак — есептеу техникасының ең көне бастауларының бірі."
+            },
+            {
+                obj: "5.1.1.1 Есептеу техникасының тарихы",
+                q: "Тарихтағы ең алғашқы электронды есептеуіш машина (ЭЕМ) қалай аталды?",
+                options: ["ENIAC", "Apple-1", "IBM PC", "Pentium"],
+                correct: 0,
+                exp: "Жарайсың! 1946 жылы жасалған бірінші ЭЕМ — ENIAC деп аталды."
+            },
+            {
+                obj: "5.1.1.2 Программалық жасақтама және ЖИ",
+                q: "Windows, Android, Linux сияқты операциялық жүйелер программалық жасақтаманың қай түріне киреді?",
+                options: ["Қолданбалы", "Жүйелік", "Инструменталды", "Ойындық"],
+                correct: 1,
+                exp: "Дұрыс! ОЖ — бұл жүйелік программалық жасақтама."
+            },
+            {
+                obj: "5.1.1.2 Программалық жасақтама және ЖИ",
+                q: "Адамша ойлау, дауысты тану және сурет салу мүмкіндігі бар заманауи технология:",
+                options: ["Компьютерлік вирус", "Жасанды интеллект (ЖИ)", "Арифмометр", "Дискета"],
+                correct: 1,
+                exp: "Керемет! Жасанды интеллект қазіргі заманауи программаларда кеңінен қолданылуда."
+            }
+        ],
+        2: [
+            {
+                obj: "5.4.1.1 Эргономика және жұмыс орны",
+                q: "Жұмыс орнын ұйымдастыруда жарық қай жақтан түскені дұрыс?",
+                options: ["Сол жақтан немесе алдынан", "Оң жақтан арқаға", "Тек қараңғыда", "Артқы жақтан көзге шағылысып"],
+                correct: 0,
+                exp: "Дұрыс! Жарық көзді шағылыстырмай, сол жақтан немесе алдынан түскені жөн."
+            },
+            {
+                obj: "5.4.1.1 Эргономика және жұмыс орны",
+                q: "Көздің шаршамауы үшін компьютерде жұмыс істегенде не істеу керек?",
+                options: ["Тоқтаусыз 5 сағат отыру", "Әр 20-30 минут сайын үзіліс жасау", "Экранға тым жақын отыру", "Монитор жарығын максималды арттыру"],
+                correct: 1,
+                exp: "Тамаша! Көзге мезгіл-мезгіл демалыс пен жаттығу қажет."
+            },
+            {
+                obj: "5.2.1.1 Ақпарат түрлері және екілік код",
+                q: "Оқушының күнделіктегі бағасы немесе ауа райының температурасы ақпараттың қай түрі?",
+                options: ["Графикалық", "Бейнеақпарат", "Сандық", "Дыбыстық"],
+                correct: 2,
+                exp: "Дұрыс! Сандар арқылы берілетін мәліметтер сандық ақпаратқа жатады."
+            },
+            {
+                obj: "5.2.1.1 Ақпарат түрлері және екілік код",
+                q: "Компьютердің екілік кодында қандай екі символ қолданылады?",
+                options: ["1 және 2", "0 және 1", "A және B", "+ және -"],
+                correct: 1,
+                exp: "Жарайсың! Екілік код тек 0 мен 1 цифрларынан тұрады."
+            },
+            {
+                obj: "5.3.3.1 Іздеу сұраныстары",
+                q: "Іздеу сұранысынан белгілі бір сөзді алып тастау үшін қандай белгі қойылады?",
+                options: ["Плюс (+)", "Минус (-)", "Жұлдызша (*)", "Нүкте (.)"],
+                correct: 1,
+                exp: "Өте жақсы! Сөздің алдына минус (-) белгісін қойса, ол сөз іздеуден шығарылады."
+            },
+            {
+                obj: "5.3.3.1 Іздеу сұраныстары",
+                q: "Google, Yandex, Bing қызметтерінің негізгі міндеті не?",
+                options: ["Тек сурет өңдеу", "Ғаламтордан ақпарат іздеу", "Антивирус болу", "Мәтін теру"],
+                correct: 1,
+                exp: "Дұрыс! Бұлар — ақпаратты іздеу жүйелері."
+            },
+            {
+                obj: "5.1.1.1 Есептеу техникасының тарихы",
+                q: "XIX ғасырда Бағдарламаланатын Аналитикалық машина жобасын кім ұсынды?",
+                options: ["Блез Паскаль", "Чарльз Бэббидж", "Билл Гейтс", "Стив Джобс"],
+                correct: 1,
+                exp: "Керемет! Чарльз Бэббидж — қазіргі компьютерлердің атасы болып саналады."
+            },
+            {
+                obj: "5.1.1.1 Есептеу техникасының тарихы",
+                q: "Заманауи компьютерлердің барлық есептеулерін орындайтын «миы»:",
+                options: ["Микропроцессор", "Қатқыл диск", "Пернетақта", "Монитор"],
+                correct: 0,
+                exp: "Дұрыс! Микропроцессор — компьютердің басты өңдеуіш құрылғысы."
+            },
+            {
+                obj: "5.1.1.2 Программалық жасақтама және ЖИ",
+                q: "Paint немесе MS Word бағдарламалары программалық жасақтаманың қай түрі?",
+                options: ["Жүйелік", "Қолданбалы", "Инструменталды", "Драйвер"],
+                correct: 1,
+                exp: "Өте жақсы! Пайдаланушының нақты тапсырмаларын орындайтын бағдарламалар — қолданбалы жасақтама."
+            },
+            {
+                obj: "5.1.1.2 Программалық жасақтама және ЖИ",
+                q: "Сұрақтарға табиғи тілде жауап беретін виртуальды ассистенттер ненің мысалы?",
+                options: ["Жүйелік блоктың", "Жасанды интеллектінің", "Сканердің", "Желілік кабельдің"],
+                correct: 1,
+                exp: "Жарайсың! Чат-боттар мен дауыстық көмекшілер ЖИ технологиясына негізделген."
+            }
+        ],
+        3: [
+            {
+                obj: "5.4.1.1 Эргономика және жұмыс орны",
+                q: "Пернетақтада мәтін тергенде қолдың білектері қалай орналасуы керек?",
+                options: ["Төмен салбырап", "Түзу, үстел үстінде еркін", "Тек саусақ ұшымен тіреліп", "Ауада қалқып"],
+                correct: 1,
+                exp: "Дұрыс! Білек шаршамауы үшін үстелде түзу әрі еркін орналасуы тиіс."
+            },
+            {
+                obj: "5.4.1.1 Эргономика және жұмыс орны",
+                q: "Монитордың жоғарғы жиегі қай деңгейде болғаны дұрыс?",
+                options: ["Көз деңгейінде немесе сәл төмен", "Бастан әлдеқайда жоғары", "Еден деңгейінде", "Төбеде"],
+                correct: 0,
+                exp: "Тамаша! Монитор көз деңгейінде болса, мойынға салмақ түспейді."
+            },
+            {
+                obj: "5.2.1.1 Ақпарат түрлері және екілік код",
+                q: "Радиодан берілетін әуен немесе қоңырау сыңғыры ақпараттың қай түрі?",
+                options: ["Мәтіндік", "Дыбыстық", "Сандық", "Графикалық"],
+                correct: 1,
+                exp: "Өте жақсы! Құлақпен еститін ақпарат — дыбыстық ақпарат."
+            },
+            {
+                obj: "5.2.1.1 Ақпарат түрлері және екілік код",
+                q: "Мультфильм немесе кинофильм ақпараттың қандай түріне жатады?",
+                options: ["Тек мәтіндік", "Тек сандық", "Бейнеақпарат (Видео)", "Тек графикалық"],
+                correct: 2,
+                exp: "Дұрыс! Дыбыс пен қозғалмалы бейнені біріктіретін ақпарат — бейнеақпарат."
+            },
+            {
+                obj: "5.3.3.1 Іздеу сұраныстары",
+                q: "«Информатика 5 сынып оқулық» сұранысы қандай іздеуге жатады?",
+                options: ["Жалпы мағынасыз іздеу", "Нақты әрі өзекті іздеу сұранысы", "Қате іздеу", "Сайтты бұғаттау"],
+                correct: 1,
+                exp: "Керемет! Бұл — нақты ақпарат табуға арналған сұраныс."
+            },
+            {
+                obj: "5.3.3.1 Іздеу сұраныстары",
+                q: "Ғаламтордан тек PDF форматындағы құжатты табу үшін іздеуде не жазылады?",
+                options: ["filetype:pdf", "format=pdf", "pdf_find", "document.pdf"],
+                correct: 0,
+                exp: "Жарайсың! filetype: әмірі арнайы форматтағы файлдарды табуға көмектеседі."
+            },
+            {
+                obj: "5.1.1.1 Есептеу техникасының тарихы",
+                q: "XVII ғасырда механикалық есептеу машинасын (Паскалина) кім ойлап тапты?",
+                options: ["Блез Паскаль", "Исаак Ньютон", "Готфрид Лейбниц", "Ада Лавлейс"],
+                correct: 0,
+                exp: "Дұрыс! Блез Паскаль 1642 жылы жезден жасалған жетектері бар машинаны ойлап тапқан."
+            },
+            {
+                obj: "5.1.1.1 Есептеу техникасының тарихы",
+                q: "Әлемдегі ең алғашқы бағдарламашы ретінде кім танымал?",
+                options: ["Маргарет Тэтчер", "Ада Лавлейс", "Мари Кюри", "Валентина Терешкова"],
+                correct: 1,
+                exp: "Өте жақсы! Ада Лавлейс Аналитикалық машинаға алғашқы бағдарлама жазған."
+            },
+            {
+                obj: "5.1.1.2 Программалық жасақтама және ЖИ",
+                q: "Python, Scratch сияқты бағдарлама жасау орталары қай топқа киреді?",
+                options: ["Жүйелік", "Қолданбалы", "Инструменталды (Бағдарламалау құралдары)", "Ойындық"],
+                correct: 2,
+                exp: "Дұрыс! Бағдарламалар жазуға арналған құралдар — инструменталды жасақтама."
+            },
+            {
+                obj: "5.1.1.2 Программалық жасақтама және ЖИ",
+                q: "Жолда жүргізушісіз өзі жүретін автономды автомобильдер нені қолданады?",
+                options: ["Жасанды интеллект", "Паскалинаны", "Дискеталарды", "Абакты"],
+                correct: 0,
+                exp: "Жарайсың! Автопилот жүйелері ЖИ арқылы жолды танып, шешім қабылдайды."
+            }
+        ],
+        4: [
+            {
+                obj: "5.4.1.1 Эргономика және жұмыс орны",
+                q: "Компьютерде ұзақ уақыт дұрыс отырмау қандай салдарға әкеледі?",
+                options: ["Омыртқаның қисаюы мен көздің шаршауы", "Көздің көруінің жақсаруы", "Сүйектің қатаюы", "Бойдың тез өсуі"],
+                correct: 0,
+                exp: "Дұрыс! Эогномиканы сақтамау денсаулыққа зиян келтіреді."
+            },
+            {
+                obj: "5.4.1.1 Эргономика және жұмыс орны",
+                q: "Жұмыс үстелінде оқулықтар мен тінтуір қалай орналасуы керек?",
+                options: ["Қол жететін ыңғайлы жерде", "Тек пернетақтаның астында", "Еденде", "Монитордың артында жасырынып"],
+                correct: 0,
+                exp: "Тамаша! Барлық қажетті құралдар қол созым жерде кедергісіз тұруы тиіс."
+            },
+            {
+                obj: "5.2.1.1 Ақпарат түрлері және екілік код",
+                q: "Кітаптағы ертегі немесе эссе мәтіні ақпараттың қай түрі?",
+                options: ["Сандық", "Мәтіндік", "Бейнеақпарат", "Дыбыстық"],
+                correct: 1,
+                exp: "Жарайсың! Әріптер мен сөздерден тұратын ақпарат — мәтіндік ақпарат."
+            },
+            {
+                obj: "5.2.1.1 Ақпарат түрлері және екілік код",
+                q: "Екілік кодтағы ең кіші ақпарат өлшем бірлігі (0 немесе 1) не деп аталады?",
+                options: ["Байт", "Бит", "Мегабайт", "Пиксель"],
+                correct: 1,
+                exp: "Дұрыс! Бір екілік цифр (0 немесе 1) — 1 бит деп аталады."
+            },
+            {
+                obj: "5.3.3.1 Іздеу сұраныстары",
+                q: "Ақпараттың «өзектілігі» деген нені білдіреді?",
+                options: ["Оның өте ескі болуын", "Қазіргі уақытқа қажетті әрі маңызды болуын", "Тек сандардан тұруын", "Құпия болуын"],
+                correct: 1,
+                exp: "Өте жақсы! Өзекті ақпарат — бұл дәл қазіргі уақыттағы жаңа, қажетті мәлімет."
+            },
+            {
+                obj: "5.3.3.1 Іздеу сұраныстары",
+                q: "Іздеуде сөздің соңы белгісіз болса (мысалы, информат*), қандай символ қойылады?",
+                options: ["Жұлдызша (*)", "Сұрақ белгісі (?)", "Торғай (#)", "Амперсанд (&)"],
+                correct: 0,
+                exp: "Дұрыс! Жұлдызша белгісі кез келген әріптер жалғасын іздеуге мүмкіндік береді."
+            },
+            {
+                obj: "5.1.1.1 Есептеу техникасының тарихы",
+                q: "1-буын компьютерлерінің басты электронды элементі не болды?",
+                options: ["Электронды вакуумдық лампалар", "Транзисторлар", "Микросхемалар", "Лазерлер"],
+                correct: 0,
+                exp: "Керемет! Алғашқы компьютерлер өте үлкен электронды лампалармен жұмыс істеген."
+            },
+            {
+                obj: "5.1.1.1 Есептеу техникасының тарихы",
+                q: "Компьютер техникасы дамуының болашақтағы жоғары жылдамдықты бағыты:",
+                options: ["Кванттық компьютерлер", "Механикалық арифмометрлер", "Баспа машиналары", "Абак"],
+                correct: 0,
+                exp: "Дұрыс! Келешек — кванттық компьютерлік технологияларда."
+            },
+            {
+                obj: "5.1.1.2 Программалық жасақтама және ЖИ",
+                q: "Архиваторлар мен антивирустар қай программалық жасақтама түріне жатады?",
+                options: ["Қолданбалы", "Жүйелік (Сервистік)", "Инструменталды", "Ойындық"],
+                correct: 1,
+                exp: "Тамаша! Компьютер жұмысын қолдайтын утилиталар жүйелік жасақтамаға жатады."
+            },
+            {
+                obj: "5.1.1.2 Программалық жасақтама және ЖИ",
+                q: "Смартфондағы Face ID (бет ажырату) функциясы қай технологияға негізделген?",
+                options: ["Жасанды интеллект", "Есепшотқа", "Драйверге", "Браузерге"],
+                correct: 0,
+                exp: "Жарайсың! Бет-әлпетті танып ажырату ЖИ алгоритмдері арқылы орындалады."
+            }
+        ],
+        5: [
+            {
+                obj: "5.4.1.1 Эргономика және жұмыс орны",
+                q: "Компьютер алдында отырғанда аяқтың орналасуы қалай болуы тиіс?",
+                options: ["Ауада салбырап", "Еденге немесе тіреуішке толық тиіп", "Айқастырып отыру", "Орындыққа бүгіп алу"],
+                correct: 1,
+                exp: "Дұрыс! Қан айналымы бұзылмауы үшін аяқ еденге толық тиіп тұруы керек."
+            },
+            {
+                obj: "5.4.1.1 Эргономика және жұмыс орны",
+                q: "Жұмыс бөлмесін мезгіл-мезгіл желдету не үшін маңызды?",
+                options: ["Таза ауамен қамтамасыз етіп, бас ауруын болдырмау", "Компьютерді мұздату үшін", "Шуды көбейту үшін", "Жарықты азайту үшін"],
+                correct: 0,
+                exp: "Өте жақсы! Таза ауа мидың жұмысын жақсартады және шаршауды басады."
+            },
+            {
+                obj: "5.2.1.1 Ақпарат түрлері және екілік код",
+                q: "Географиялық карта, диаграмма және сызбалар ақпараттың қай түрі?",
+                options: ["Дыбыстық", "Графикалық", "Мәтіндік", "Сандық"],
+                correct: 1,
+                exp: "Жарайсың! Көрнекі бейнелер — графикалық ақпарат."
+            },
+            {
+                obj: "5.2.1.1 Ақпарат түрлері және екілік код",
+                q: "8 биттен тұратын ақпарат тобы қалай аталады?",
+                options: ["Байт", "Килограмм", "Пиксель", "Код"],
+                correct: 0,
+                exp: "Дұрыс! 1 Байт = 8 Бит."
+            },
+            {
+                obj: "5.3.3.1 Іздеу сұраныстары",
+                q: "Нақты ақпарат алу үшін іздеу сұранысы қандай болуы керек?",
+                options: ["Тым ұзын әрі түсініксіз", "Нақты, қысқа әрі негізгі сөздерден тұратын", "Тек 1 әріптен тұратын", "Тек сандардан тұратын"],
+                correct: 1,
+                exp: "Тамаша! Қысқа да нұсқа кілт сөздер ең жақсы нәтиже береді."
+            },
+            {
+                obj: "5.3.3.1 Іздеу сұраныстары",
+                q: "Нақты бір веб-сайттың ішінен іздеу үшін қандай оператор қолданылады?",
+                options: ["site:", "search:", "web:", "find:"],
+                correct: 0,
+                exp: "Керемет! site:операторы тек көрсетілген сайт ішінде іздеу жүргізеді."
+            },
+            {
+                obj: "5.1.1.1 Есептеу техникасының тарихы",
+                q: "Алғашқы дербес компьютерлер (ДK) қай ғасырда пайда бола бастады?",
+                options: ["XV ғасыр", "XX ғасырдың 70-80 жылдары", "XXI ғасырдың 2020 жылы", "XVIII ғасыр"],
+                correct: 1,
+                exp: "Дұрыс! 1970-1980 жылдары жеке пайдалануға арналған компьютерлер шықты."
+            },
+            {
+                obj: "5.1.1.1 Есептеу техникасының тарихы",
+                q: "3-буын компьютерлерінде транзисторлардың орнына не қолданылды?",
+                options: ["Интегралдық схемалар (чиптер)", "Вакуумдық лампалар", "Ағаш тетіктер", "Резисторлар"],
+                correct: 0,
+                exp: "Жарайсың! Интегралдық микросхемалар компьютерлердің көлемін кішірейтті."
+            },
+            {
+                obj: "5.1.1.2 Программалық жасақтама және ЖИ",
+                q: "Microsoft Word, PowerPoint бағдарламалары қай жасақтамаға жатады?",
+                options: ["Қолданбалы", "Жүйелік", "Инструменталды", "Базалық"],
+                correct: 0,
+                exp: "Өте жақсы! Бұл программалар пайдаланушыға құжаттармен жұмыс істеуге арналған."
+            },
+            {
+                obj: "5.1.1.2 Программалық жасақтама және ЖИ",
+                q: "Дауыстық ассистенттер (Алиса, Siri, Google Assistant) ненің негізінде жұмыс істейді?",
+                options: ["Жасанды интеллект", "Есепшот", "Пернетақта", "Принтер"],
+                correct: 0,
+                exp: "Дұрыс! Олар ЖИ арқылы адам даусын ажыратып, командаларды орындайды."
+            }
+        ]
+    };
+
+    let currentVariant = 1;
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    // Смайликтер топтамасы
+    const correctEmojis = ["😃", "🎉", "👏", "⭐", "🤩", "🥳"];
+    const wrongEmojis = ["🤔", "😔", "💡", "🧐", "❌"];
+
+    function initQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        answered = false;
+        
+        document.getElementById("quizScreen").style.display = "block";
+        document.getElementById("resultsScreen").style.display = "none";
+        
+        loadQuestion();
+    }
+
+    function switchVariant(variantNum) {
+        currentVariant = variantNum;
+        
+        // Батырмалардың белсенділігін ауыстыру
+        const btns = document.querySelectorAll(".variant-btn");
+        btns.forEach((btn, idx) => {
+            if (idx + 1 === variantNum) {
+                btn.classList.add("active");
+            } else {
+                btn.classList.remove("active");
+            }
+        });
+
+        initQuiz();
+    }
+
+    function loadQuestion() {
+        answered = false;
+        const currentQuiz = quizDatabase[currentVariant];
+        const qData = currentQuiz[currentQuestionIndex];
+
+        // UI жаңарту
+        document.getElementById("variantLabel").innerText = `Нұсқа: ${currentVariant}`;
+        document.getElementById("questionCounter").innerText = `Сұрақ: ${currentQuestionIndex + 1} / ${currentQuiz.length}`;
+        document.getElementById("objectiveBadge").innerText = `Оқу мақсаты: ${qData.obj}`;
+        document.getElementById("questionText").innerText = qData.q;
+
+        // Прогресс бар
+        const progressPercent = ((currentQuestionIndex) / currentQuiz.length) * 100;
+        document.getElementById("progressBar").style.width = `${progressPercent}%`;
+
+        // Жасырын блоктарды реттеу
+        document.getElementById("feedbackBox").classList.remove("show", "correct-box", "wrong-box");
+        document.getElementById("nextBtn").style.display = "none";
+
+        // Нұсқаларды шығару
+        const optionsContainer = document.getElementById("optionsContainer");
+        optionsContainer.innerHTML = "";
+
+        qData.options.forEach((optText, index) => {
+            const btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.innerHTML = `<b style="margin-right:10px;">${String.fromCharCode(65 + index)})</b> ${optText}`;
+            btn.onclick = () => selectOption(index);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function selectOption(selectedIndex) {
+        if (answered) return;
+        answered = true;
+
+        const currentQuiz = quizDatabase[currentVariant];
+        const qData = currentQuiz[currentQuestionIndex];
+        const optionBtns = document.querySelectorAll(".option-btn");
+
+        // Батырмаларды бұғаттау
+        optionBtns.forEach(btn => btn.disabled = true);
+
+        const feedbackBox = document.getElementById("feedbackBox");
+        const feedbackEmoji = document.getElementById("feedbackEmoji");
+        const feedbackTitle = document.getElementById("feedbackTitle");
+        const feedbackDesc = document.getElementById("feedbackDesc");
+
+        if (selectedIndex === qData.correct) {
+            score++;
+            optionBtns[selectedIndex].classList.add("correct");
+            
+            // Рандомды қуанышты смайлик
+            const randomEmoji = correctEmojis[Math.floor(Math.random() * correctEmojis.length)];
+            feedbackEmoji.innerText = randomEmoji;
+            feedbackTitle.innerText = "Өте жақсы! Дұрыс жауап!";
+            feedbackDesc.innerText = qData.exp;
+            
+            feedbackBox.className = "feedback-box show correct-box";
+        } else {
+            optionBtns[selectedIndex].classList.add("wrong");
+            optionBtns[qData.correct].classList.add("correct");
+
+            // Рандомды ойлы смайлик
+            const randomEmoji = wrongEmojis[Math.floor(Math.random() * wrongEmojis.length)];
+            feedbackEmoji.innerText = randomEmoji;
+            feedbackTitle.innerText = "Қате жауап!";
+            feedbackDesc.innerText = qData.exp;
+
+            feedbackBox.className = "feedback-box show wrong-box";
+        }
+
+        document.getElementById("nextBtn").style.display = "block";
+    }
+
+    function nextQuestion() {
+        const currentQuiz = quizDatabase[currentVariant];
+        currentQuestionIndex++;
+
+        if (currentQuestionIndex < currentQuiz.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        document.getElementById("quizScreen").style.display = "none";
+        document.getElementById("resultsScreen").style.display = "block";
+
+        const total = quizDatabase[currentVariant].length;
+        const percent = Math.round((score / total) * 100);
+
+        document.getElementById("scoreNum").innerText = `${score} / ${total}`;
+        document.getElementById("scorePercent").innerText = `${percent}% ұпай`;
+
+        const rEmoji = document.getElementById("resultsEmoji");
+        const rTitle = document.getElementById("resultsTitle");
+        const rFeedback = document.getElementById("resultsFeedback");
+
+        if (percent >= 90) {
+            rEmoji.innerText = "🏆";
+            rTitle.innerText = "Ғажап нәтиже!";
+            rFeedback.innerText = "Сен Информатика пәнін өте үздік меңгеріпсің! Жарайсың! 🌟";
+        } else if (percent >= 70) {
+            rEmoji.innerText = "👍";
+            rTitle.innerText = "Жақсы нәтиже!";
+            rFeedback.innerText = "Білімің өте жақсы, бірақ тағы да жетілдіруге болады! 😊";
+        } else if (percent >= 50) {
+            rEmoji.innerText = "🤔";
+            rTitle.innerText = "Орташа нәтиже";
+            rFeedback.innerText = "Тақырыптарды қайталап, тестті қайта өтуге кеңес береміз! 📚";
+        } else {
+            rEmoji.innerText = "💡";
+            rTitle.innerText = "Тағы да талпынып көр!";
+            rFeedback.innerText = "Бағдарлама материалын қайта қарап шығып, қайтадан бағыңды сына! 🦾";
+        }
+    }
+
+    function restartQuiz() {
+        initQuiz();
+    }
+
+    // Бастапқы іске қосу
+    initQuiz();
+</script>
+
+</body>
+</html>
